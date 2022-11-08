@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<link rel="stylesheet" type="text/css" href="assets/css/main.css">
+	<script src="assets/js/jquery-3.6.1.min.js"></script>
+	<script src="assets/js/menu.js"></script>
+	<title>Balloon hunt</title>
+</head>
+<body oncontextmenu="return false;">
+	<div id="menu">
+		<!-- Стартовое меню -->
+	<h1>Balloon hunt</h1>
+	<input type="text" class="name">
+	<input type="submit" value="Start" class="start_game">
+	<input type="submit" value="Settings" class="settings">
+	<section class="settings_window">
+		<p class="close">x</p><!--можно заменить на иконку-->
+		<h2>Settings</h2>
+		<section class="volume">
+			<img src="assets/images/volume.svg
+			" class="volume_image">
+			<input type="range">
+		</section>
+	</section>
+	</div>
+	
+	<div id="game">
+		<!-- Окно игры -->
+	<canvas id="game_zone">
+		
+	</canvas>
+	<script src="assets/js/game.js">
+		
+	</script>
+	</div>
+</body>
+</html>

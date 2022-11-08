@@ -1,0 +1,84 @@
+*{
+	margin: 0;
+	padding: 0;
+}
+
+#menu{
+	display: grid;
+	grid-template-rows: 25vh 20vh repeat(3, 10vh) 25vh ; 
+	background: lightblue;
+	/*background-repeat: no-repeat;
+	background-size: cover;*/
+	position: relative;
+
+}
+#menu .settings_window{
+	display: none;
+	position: absolute;
+	width: 50%;
+	left: 25%;
+	top:  25vh;
+	height: 50vh;
+	background: white;
+	grid-template-rows: 5vh repeat(4,10vh) 5vh;
+	align-items: center;
+	border: 1px solid black;
+	border-radius: 26px;
+}
+#menu .settings_window .close{
+	font-size: 2.5vh;
+	font-weight: bolder;
+	width: 10%;
+	margin-left: 90%;
+	cursor: pointer;
+}
+.settings_window h2{
+	text-align: center;
+}
+.settings_window .volume{
+	width: 80%;
+	height: 8vh;
+	margin: auto;
+	display: grid;
+	grid-template-columns: 20% 80%;
+	align-items: center;
+}
+.volume_image{
+	width: 8vh;
+	height: 8vh;
+}
+#menu h1{
+	grid-row: 1;
+	color: white;
+	text-align: center;
+}
+#menu .name{
+	grid-row: 3;
+	width: 50%;
+	height: 5vh;
+	margin: 2vh 25%;
+}
+#menu .start_game{
+	grid-row: 4;
+	width: 50%;
+	height: 5vh;
+	margin: 2vh 25%;
+}
+#menu .settings{
+	grid-row: 5;
+	width: 50%;
+	height: 5vh;
+	margin: 2vh 25%;
+}
+#game{
+	display: none;
+	width: 100%;
+	height: 100vh;
+}
+#game #game_zone{
+	width: 100%;
+	height: 100vh;
+	background: url("../images/background.png");
+	background-repeat: no-repeat;
+	background-size: cover;
+}
