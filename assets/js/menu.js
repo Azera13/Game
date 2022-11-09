@@ -24,11 +24,4 @@ $(document).ready(function(){
 		let settings_window = $('.settings_window');
 		settings_window.fadeOut();
 	});
-	$('.builds ul li').click(function(){
-		select_image_x = $(this).attr("x");
-		select_image_y= $(this).attr("y");
-		type = $(this).attr("type");
-		$(".builds li img").css("background","none");
-		$(this).find("img").css("background","lightgreen");
-	});
 });

@@ -1,46 +1,60 @@
 let canvas = document.getElementById("game_zone");
 let context = canvas.getContext("2d");
 
-let width_screen = window.innerWidth;
-let height_screen = window.innerHeight;
+var scale = 0.1;// Масштаб
 
-canvas.width = width_screen;
-canvas.height = height_screen;
+Resize();// При загрузке страницы задается размер холста
+
+window.addEventListener("resize", Resize); 
+// При изменении размеров окна будут меняться размеры холста
+
+var objects = [];// Массив игровых объектов
+
+function Start(){
+    timer = setInterval(Update, 1000/60);
+    // Состояние игры будет обновляться 60 раз в секунду 
+}
+
+function Stop(){
+    clearInterval(timer);// Остановка обновления
+}
+
+// Обновление игры
+function Update(){
+    Draw();
+
+    if(RandomInt(0,10000) > 9700){
+        objects.push(new Balloon("assets/images/balloon_red.png", 
+            RandomInteger(30, canvas.width - 50), 
+            RandomInteger(250, 400) * -1));
+    }
+}
+
+//Работа с графикой
+function Draw(){
+    context.clearRect(0, 0, canvas.width, canvas.height);
+    //Очистка холста от предыдущего кадра
+
+    for(var i = 0; i < objects.length; i++)
+{
+    ctx.drawImage
+    (
+        objects[i].image, //Изображение для отрисовки
+        0, //Начальное положение по оси X на изображении
+        0, //Начальное положение по оси Y на изображении
+        objects[i].image.width, //Ширина изображения
+        objects[i].image.height, //Высота изображения
+        objects[i].x, //Положение по оси X на холсте
+        objects[i].y, //Положение по оси Y на холсте
+        objects[i].image.width * scale, //Ширина изображения на холсте, умноженная на масштаб
+        objects[i].image.height * scale //Высота изображения на холсте, умноженная на масштаб
+    );
+}
+}
 
 let mousePos;
 
-
-//Изображения//
-let aim_image = new Image();
-aim_image.src = "assets/images/aim_cross.png";
-
-let balloon_image = new Image();
-balloon_image.src = "assets/images/balloon.png";
-
-let gun_image = new Image();
-gun_image.src = "assets/images/gun.png";
-
-let aim_cross = {
-    w:35,
-    h:35,
-    x:width_screen/2,
-    y:height_screen/2,
-    speed:5,
-    image_h:200,
-    image_w:200
-}
-
-let balloon = {
-    w:85,
-    h:100,
-    x:width_screen/2,
-    y:height_screen/2,
-    speed:5,
-    image_h:240,
-    image_w:220
-}
-
-// Часть отслеживания курсора//
+// Часть отслеживания курсора //
 function CalcMousePos(canvas, e){
     var rect = canvas.getBoundingClientRect();
     return {
@@ -49,16 +63,58 @@ function CalcMousePos(canvas, e){
     };
 }
 
-//Передвижение мыши и прицела//
+// Передвижение мыши и прицела //
 canvas.addEventListener('mousemove',function(e){
     context.clearRect(aim_cross.x,aim_cross.y,aim_cross.w,aim_cross.h);
-	var mousePos = CalcMousePos(canvas,e);
+    var mousePos = CalcMousePos(canvas,e);
     console.log("x:"+mousePos.x+" y:"+mousePos.y);
     aim_cross.x = mousePos.x;
     aim_cross.y = mousePos.y
 });
 
-//Стрельба//
+function Resize(){
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+}
+
+// Изображения //
+let aim_image = new Image();
+aim_image.src = "assets/images/aim_cross.png";
+
+let aim_cross = {
+    w:35,
+    h:35,
+    x:canvas.width/2,
+    y:canvas.height/2,
+    speed:5,
+    image_h:200,
+    image_w:200
+}
+
+////
+// Логика игры //
+class Balloon{
+    constructor(image, x, y){
+        this.x = x;
+        this.y = y;
+
+        this.image = new Image();
+        this.image.src = "assets/images/balloon_red.png";
+    }
+
+    Update(){
+        this.y += speed;
+    }
+
+}
+
+function RandomInt(min,max){
+    let rand = min - 0.5 + Math.random() * (max - min + 1);
+    return Math.round(rand);
+}
+
+
+// Стрельба //
 canvas.addEventListener('click',function(e){
     var rect = canvas.getBoundingClientRect();
     let x = e.clientX - Math.trunc(rect.left);
@@ -69,7 +125,7 @@ canvas.addEventListener('click',function(e){
 });
 
 function Game(){
-	// Отрисовка изображения//
+	// Отрисовка изображения //
     context.drawImage(
         aim_image,
         0,
@@ -81,21 +137,10 @@ function Game(){
         aim_cross.w,
         aim_cross.h
     );
-    context.drawImage(
-        balloon_image,
-        0,
-        0,
-        balloon.image_w,
-        balloon.image_h,
-        balloon.x,
-        balloon.y,
-        balloon.w,
-        balloon.h
-    );
     requestAnimationFrame(Game);
 }
 
-let hit = [];
+// Попадание/промах //
 function Pop(){
     if(balloon.x + balloon.w > aim_cross.x
         && balloon.x < aim_cross.x + aim_cross.w
@@ -108,119 +153,3 @@ function Pop(){
     }
 }
 
-//Цикл игры//
-// var lastTime;
-// function main(){
-//     var now = Date.now();
-//     var dt = (now - lastTime)
-
-//     update(dt);
-//     render();
-
-//     lastTime = now;
-//     requestAnimFrame(main);
-// }
-// //Состояние игры//
-// var player = {
-//     pos: [0, 0],
-//     sprite: new Sprite(aim_image,[0,0],[199,200],16,[0,1])
-// };
-
-// var bullets = [];
-// var balloons = [];
-// var pop = [];
-
-// var lastFire = Date.now();
-// var gameTime = 0;
-// var isGameOver;
-
-// //Счет//
-// var score = 0;
-// var scoreEl = document.getElementById('score');
-
-// //Сущности//
-
-// balloons.push({
-//     pos:[100,50],
-//     sprite: new Sprite(balloon_image,[0,0],[220,240],20,[0,1])
-// });
-
-// //Спрайты и анимация//
-// var resourceCache = {};
-
-// function get(url){
-//     return resourceCache[url];
-// }
-
-
-// function Sprite(url,pos,size,speed,frames,dir,once){
-//     this.pos = pos;
-//     this.size =size;
-//     this.speed = typeof speed ==='number' ? speed : 0;
-//     this.frames = frames;
-//     this._index = 0;
-//     thisurl = url;
-//     this.dir = dir || 'horizontal';
-//     this.once = once;
-// }
-
-// Sprite.prototype.update = function(dt) {
-//     this._index +=this.speed*dt;
-// }
-
-// //Отрисовка объектами себя//
-// //Что-то сложное, но вдруг пригодится//
-// Sprite.prototype.render = function(ctx) {
-//     var frame;
-
-//     if(this.speed > 0) {
-//         var max = this.frames.length;
-//         var idx = Math.floor(this.index);
-//         frame = this.frames[idx % max];
-
-//         if (this.once && idx >= max) {
-//             this.done = true;
-//             return;
-
-//         }
-//     }
-//     else{
-//         frame = 0;
-//     }
-
-//     var x = this.pos[0];
-//     var y = this.pos[1];
-
-//     if(this.dir == 'vertical'){
-//         y == frame * this.size[1];
-//     }
-//     else{
-//         x += frame * this.size[0];
-//     }
-
-//     ctx.drawImage(resources.get(this.url),
-//         x, y,
-//         this.size[0], this.size[1],
-//         0, 0,
-//         this.size[0], this.size[1]);
-// }
-
-// //обновление сцены//
-// function update(dt){
-//     gameTime += dt;
-
-//     handleInput(dt);
-//     updateEntities(dt);
-
-//     if(Math.random() < 1 - Math.pow(.993, gameTime)){
-//         enemies,push({
-//             pos: [canvas.width,
-//             Math.random() * (canvas.height - 39)],
-//             sprite: new Sprite('images')
-//         });
-//     }
-
-//     checkCollisions();
-
-//     scoreEl.innerHTML = score;
-// };
