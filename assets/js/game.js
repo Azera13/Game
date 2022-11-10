@@ -1,3 +1,35 @@
+// Классы //
+class Aim{
+    constructor(image, x, y){
+        this.x = x;
+        this.y = y;
+
+        this.image = new Image();
+        this.image.src = "assets/images/aim_cross.png";
+    }
+    Update(){
+
+    }
+}
+
+class Balloon{
+    constructor(image, x, y){
+        this.x = x;
+        this.y = y;
+
+        this.image = new Image();
+        this.image.src = "assets/images/balloon_red.png";
+    }
+
+    Update(){
+
+    }
+}
+
+const UPDATE_TIME = 1000 / 60;
+
+var timer = null;
+
 let canvas = document.getElementById("game_zone");
 let context = canvas.getContext("2d");
 
@@ -10,58 +42,34 @@ window.addEventListener("resize", Resize);
 
 var objects = [];// Массив игровых объектов
 
+var player = new Aim("images/aim_cross.png", canvas.width / 2, canvas.height / 2);
+
+Start();
+
 function Start(){
-    timer = setInterval(Update, 1000/60);
+    timer = setInterval(Update, UPDATE_TIME);
     // Состояние игры будет обновляться 60 раз в секунду 
 }
 
 function Stop(){
     clearInterval(timer);// Остановка обновления
+    timer = null;
 }
 
 // Обновление игры
 function Update(){
-    Draw();
-
     if(RandomInt(0,10000) > 9700){
         objects.push(new Balloon("assets/images/balloon_red.png", 
-            RandomInteger(30, canvas.width - 50), 
-            RandomInteger(250, 400) * -1));
+            RandomInt(30, canvas.width - 50), 
+            RandomInt(250, 400) * -1));
     }
+
+    Draw();
 }
 
-//Работа с графикой
-function Draw(){
-    context.clearRect(0, 0, canvas.width, canvas.height);
-    //Очистка холста от предыдущего кадра
 
-    for(var i = 0; i < objects.length; i++)
-{
-    ctx.drawImage
-    (
-        objects[i].image, //Изображение для отрисовки
-        0, //Начальное положение по оси X на изображении
-        0, //Начальное положение по оси Y на изображении
-        objects[i].image.width, //Ширина изображения
-        objects[i].image.height, //Высота изображения
-        objects[i].x, //Положение по оси X на холсте
-        objects[i].y, //Положение по оси Y на холсте
-        objects[i].image.width * scale, //Ширина изображения на холсте, умноженная на масштаб
-        objects[i].image.height * scale //Высота изображения на холсте, умноженная на масштаб
-    );
-}
-}
 
 let mousePos;
-
-// Часть отслеживания курсора //
-function CalcMousePos(canvas, e){
-    var rect = canvas.getBoundingClientRect();
-    return {
-        x: e.clientX - Math.trunc(rect.left),
-        y: e.clientY - Math.trunc(rect.top)
-    };
-}
 
 // Передвижение мыши и прицела //
 canvas.addEventListener('mousemove',function(e){
@@ -72,10 +80,7 @@ canvas.addEventListener('mousemove',function(e){
     aim_cross.y = mousePos.y
 });
 
-function Resize(){
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
-}
+
 
 // Изображения //
 let aim_image = new Image();
@@ -91,27 +96,8 @@ let aim_cross = {
     image_w:200
 }
 
-////
 // Логика игры //
-class Balloon{
-    constructor(image, x, y){
-        this.x = x;
-        this.y = y;
 
-        this.image = new Image();
-        this.image.src = "assets/images/balloon_red.png";
-    }
-
-    Update(){
-        this.y += speed;
-    }
-
-}
-
-function RandomInt(min,max){
-    let rand = min - 0.5 + Math.random() * (max - min + 1);
-    return Math.round(rand);
-}
 
 
 // Стрельба //
@@ -123,6 +109,19 @@ canvas.addEventListener('click',function(e){
 
     Pop();
 });
+
+// Попадание/промах //
+function Pop(){
+    if(balloon.x + balloon.w > aim_cross.x
+        && balloon.x < aim_cross.x + aim_cross.w
+        && balloon.y + balloon.h > aim_cross.y
+        && balloon.y < aim_cross.y + aim_cross.h == true){
+        console.log("POP!");
+    }
+    else{
+        console.log("miss");
+    }
+}
 
 function Game(){
 	// Отрисовка изображения //
@@ -140,16 +139,62 @@ function Game(){
     requestAnimationFrame(Game);
 }
 
-// Попадание/промах //
-function Pop(){
-    if(balloon.x + balloon.w > aim_cross.x
-        && balloon.x < aim_cross.x + aim_cross.w
-        && balloon.y + balloon.h > aim_cross.y
-        && balloon.y < aim_cross.y + aim_cross.h == true){
-        console.log("POP!");
-    }
-    else{
-        console.log("miss");
+//Работа с графикой
+function Draw(){
+    context.clearRect(0, 0, canvas.width, canvas.height);
+    //Очистка холста от предыдущего кадра
+
+    for(var i = 0; i < objects.length; i++)
+    {
+        DrawBalloon(objects[i]);
     }
 }
 
+function DrawBalloon(Balloon){
+    context.drawImage(
+            Balloon.image,
+            0,
+            0,
+            Balloon.image.width,
+            Balloon.image.height,
+            Balloon.x,
+            Balloon.y,
+            Balloon.image.width * scale,
+            Balloon.image.height * scale
+        )
+}
+
+// Часть отслеживания курсора //
+function CalcMousePos(canvas, e){
+    var rect = canvas.getBoundingClientRect();
+    return {
+        x: e.clientX - Math.trunc(rect.left),
+        y: e.clientY - Math.trunc(rect.top)
+    };
+}
+
+function KeyDown(e){
+
+    switch(e.keyCode){
+        case 27: //Esc
+        if(timer == null){
+            Start();
+        }
+        else{
+            Stop();
+        }
+        break;
+    }
+}
+
+// Масштабирование //
+function Resize(){
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+}
+
+// Генератор случайных чисел //
+function RandomInt(min,max){
+    let rand = min - 0.5 + Math.random() * (max - min + 1);
+    return Math.round(rand);
+}
