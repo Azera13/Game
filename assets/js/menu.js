@@ -9,7 +9,7 @@ $(document).ready(function(){
 		Game();
 		}
 		else{
-			alert("Может сначала назовешь свое имя?")
+			alert("Введите свое имя, пожалуйста")
 		}
 		console.log(name_user);
 		console.log(block_menu);
