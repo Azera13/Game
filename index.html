@@ -15,6 +15,7 @@
 	<input type="text" class="name">
 	<input type="submit" value="Start" class="start_game">
 	<input type="submit" value="Settings" class="settings">
+	<input type="submit" value="Records" class="records">
 	<section class="settings_window">
 		<p class="close">x</p>
 		<h2>Settings</h2>
@@ -24,13 +25,24 @@
 			<input type="range">
 		</section>
 	</section>
+	<section class="records_window">
+		<p class="close">x</p>
+		<h2>Records</h2>
+		<section class="record_panel">
+			<div id="idrecords"></div>
+			<script src="assets/js/records.js"></script>
+
+		</section>
+	</section>
 	</div>
 	
 	<div id="game">
 		<!-- Окно игры -->
+	<p id="idscore">Счет</p>
 	<canvas id="game_zone">
 		
 	</canvas>
+	<p id="tip">R - Reload</p>
 	<script src="assets/js/game.js">
 		
 	</script>

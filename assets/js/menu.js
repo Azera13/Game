@@ -1,6 +1,8 @@
+var name_user = "";
+
 $(document).ready(function(){
 	$(".start_game").click(function(){
-		let name_user = $('.name').val();
+		name_user = $('.name').val();
 		let block_menu = $('#menu');
 		let block_game = $('#game');
 		if(name_user != ""){
@@ -23,5 +25,14 @@ $(document).ready(function(){
 	$('.close').click(function(){
 		let settings_window = $('.settings_window');
 		settings_window.fadeOut();
+	});
+
+	$('.records').click(function(){
+		let records_window = $('.records_window');
+		records_window.fadeIn();
+	});
+	$('.close').click(function(){
+		let records_window = $('.records_window');
+		records_window.fadeOut();
 	});
 });

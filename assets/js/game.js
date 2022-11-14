@@ -17,13 +17,33 @@ class Aim{
     }
 }
 
+class Bullet{
+    constructor(image, x, y){
+        this.x = x;
+        this.y = y;
+
+        this.loaded = false;
+
+        this.image = new Image();
+
+        var obj = this;
+
+        this.image.addEventListener("load", function () { obj.loaded = true; });
+
+        this.image.src = image;
+    }
+
+    Update(){
+
+    }
+}
+
 class Balloon{
     constructor(image, x, y){
         this.x = x;
         this.y = y;
 
         this.loaded = false;
-        this.popped = false;
 
         this.image = new Image();
 
@@ -84,8 +104,8 @@ const UPDATE_TIME = 1000 / 60;
 
 var timer = null;
 
-let canvas = document.getElementById("game_zone");
-let context = canvas.getContext("2d");
+var canvas = document.getElementById("game_zone");
+var context = canvas.getContext("2d");
 
 var scale = 0.5;// Масштаб
 
@@ -101,11 +121,15 @@ var objects = [];// Массив игровых объектов
 
 var player = new Aim(canvas.width / 2, canvas.height / 2);
 
+var bullets = [];
+
 var background_img = new Background("assets/images/background.png",0);
 
 var speed = 2;
 
 var mousePos = 0;
+
+var score = 0;
 
 Start();
 
@@ -113,17 +137,34 @@ function Start(){
     if(!player.dead){
         timer = setInterval(Update, UPDATE_TIME);
         // Состояние игры будет обновляться 60 раз в секунду 
-    }   
+    }  
+
+    var distance = 25;
+    var pos = 0;
+
+    for(var i = 0; i < 5; i++){      
+        bullets.push(new Bullet("assets/images/bullet.png",
+            pos,
+            canvas.height - 50));
+        var pos = pos + distance;
+        DrawBullet(bullets[i]);
+    }
     
 }
 
 function Stop(){
     clearInterval(timer);// Остановка обновления
     timer = null;
+
+    // records.push((name_user + " " + score)); не работает//
 }
 
 // Обновление игры
 function Update(){
+
+    var p;
+    p = document.getElementById('idscore');
+    p.innerHTML = "Счет: " + score;
 
     if(RandomInt(0,10000) > 9700){
         objects.push(new Balloon("assets/images/balloon.png", 
@@ -139,20 +180,14 @@ function Update(){
         Stop();
     }
 
-    var isPopped = false; 
-
     for(var i = 0; i < objects.length; i++)
     {
-        objects[i].Update();
+        objects[i].Update();          
+    }
 
-        if(objects[i].popped)
-        {
-            isPopped = true;
-        }
-
-        if(isPopped){
-            objects.splice(i,1);
-        }
+    for(var i = 0; i < bullets.length; i++)
+    {
+        bullets[i].Update();
     }
 
     Draw();
@@ -172,16 +207,27 @@ canvas.addEventListener('click',function(e){
 
     var hit = false;
 
-    for(var i = 0; i < objects.length; i++)
+    var ammo = true;
+
+    if(bullets.length == 0){
+        ammo = false;
+    }
+
+    if(ammo){
+        for(var i = 0; i < objects.length; i++)
     {
         hit = objects[i].Pop();
 
         if(hit)
         {
-            objects[i].popped = true;
+            objects.splice(i,1);
+            score += 300;
             break;
         }
     }
+
+    bullets.pop();
+    }  
 });
 
 
@@ -206,6 +252,11 @@ function Draw(){
     {
         DrawBalloon(objects[i]);
     }
+
+    for(var i = 0; i < bullets.length; i++)
+    {
+        DrawBullet(bullets[i]);
+    }
 }
 
 function DrawBalloon(balloon){
@@ -219,6 +270,19 @@ function DrawBalloon(balloon){
             balloon.y,
             balloon.image.width * scale,
             balloon.image.height * scale
+        )
+}
+function DrawBullet(bullet){
+    context.drawImage(
+            bullet.image,
+            0,
+            0,
+            bullet.image.width,
+            bullet.image.height,
+            bullet.x,
+            bullet.y,
+            bullet.image.width * scale / 2,
+            bullet.image.height * scale / 2
         )
 }
 
@@ -247,6 +311,24 @@ function KeyDown(e)
             {
                 Stop();
                 console.log("stop");
+            }
+            break;
+        case 82: //R
+            var distance = 25;
+            if (bullets.length == 0){
+                var pos = 0 - distance;
+            }
+            else{
+                var pos = bullets[bullets.length - 1].x;
+            }
+            
+            var howmuch = bullets.length;
+            for(var i = 0; i < 5 - howmuch;i++){
+                bullets.push(new Bullet("assets/images/bullet.png",
+                    pos + distance,
+                    canvas.height - 50));
+                pos = pos + distance;
+                DrawBullet(bullets[i]);
             }
             break;
     }
