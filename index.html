@@ -30,8 +30,19 @@
 		<h2>Records</h2>
 		<section class="record_panel">
 			<div id="idrecords"></div>
-			<script src="assets/js/records.js"></script>
+			<script type="text/javascript">
+				var ul = document.createElement('ul');
+				document.getElementById("idrecords").appendChild(ul);
 
+				let decodedCookie = decodeURIComponent(document.cookie);
+  				let records = decodedCookie.split(';');
+ 
+				records.forEach(function(record){
+  					var li = document.createElement('li');
+  					ul.appendChild(li);
+  					li.innerHTML += record;
+				});
+			</script>
 		</section>
 	</section>
 	</div>

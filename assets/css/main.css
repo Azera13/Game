@@ -72,6 +72,9 @@
 .records_window h2{
 	text-align: center;
 }
+#idrecords{
+	margin-left: 10%;
+}
 
 #menu h1{
 	grid-row: 1;

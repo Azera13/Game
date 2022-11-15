@@ -16,6 +16,26 @@ class Aim{
         this.y = mousePos.y;
     }
 }
+class Strike{
+    constructor(image, x, y){
+        this.x = x;
+        this.y = y;
+
+        this.loaded = false;
+
+        this.image = new Image();
+
+        var obj = this;
+
+        this.image.addEventListener("load", function () { obj.loaded = true; });
+
+        this.image.src = image;        
+    }
+
+    Update(){
+
+    }
+}
 
 class Bullet{
     constructor(image, x, y){
@@ -57,11 +77,6 @@ class Balloon{
     Update(){
 
         this.y -= speed + RandomInt(1,3);
-
-        if(this.y > canvas.height + 50)
-        {
-            this.popped = true;
-        }
     }
 
     Pop(balloon){
@@ -77,6 +92,15 @@ class Balloon{
             }
         }
         return hit;
+    }
+    Delete(ballon){
+        var out = false;
+
+        if(this.y <  -100)
+        {
+            out = true;
+        }
+        return out;
     }
 }
 
@@ -121,6 +145,8 @@ var objects = [];// Массив игровых объектов
 
 var player = new Aim(canvas.width / 2, canvas.height / 2);
 
+var strikes = [];
+
 var bullets = [];
 
 var background_img = new Background("assets/images/background.png",0);
@@ -153,10 +179,11 @@ function Start(){
 }
 
 function Stop(){
-    clearInterval(timer);// Остановка обновления
-    timer = null;
+    SetCookie(name_user,score);
+    console.log(name_user + " " + score);
 
-    // records.push((name_user + " " + score)); не работает//
+    clearInterval(timer);// Остановка обновления
+    timer = null;   
 }
 
 // Обновление игры
@@ -168,27 +195,50 @@ function Update(){
 
     if(RandomInt(0,10000) > 9700){
         objects.push(new Balloon("assets/images/balloon.png", 
-            RandomInt(0, canvas.width - 50), 
+            RandomInt(0, canvas.width - 75), 
             RandomInt(canvas.height, canvas.height + 10)));
     }
 
     player.Update();
 
+    if(strikes.length == 5){
+        player.dead = true
+    }
+
     if(player.dead)
     {
-        console.log("Oof!");
         Stop();
+        alert("Игра окончена")
     }
 
     for(var i = 0; i < objects.length; i++)
     {
-        objects[i].Update();          
+        objects[i].Update();
+
+        out = objects[i].Delete();
+
+        if(out){
+            objects.splice(i,1);
+            console.log("out");
+
+            var dist = 35;
+            var p = canvas.width;
+            
+            if(strikes.length != 0){
+                var p = strikes[strikes.length - 1].x;
+            }
+
+            strikes.push(new Strike("assets/images/strike.png",
+                p - dist,
+                5));
+            var p = p - dist;
+            for(var i = 0; i < strikes.length; i++){
+                DrawStrike(strikes[i]);
+            }
+            break;
+        }        
     }
 
-    for(var i = 0; i < bullets.length; i++)
-    {
-        bullets[i].Update();
-    }
 
     Draw();
 }
@@ -221,7 +271,7 @@ canvas.addEventListener('click',function(e){
         if(hit)
         {
             objects.splice(i,1);
-            score += 300;
+            score += 1;
             break;
         }
     }
@@ -257,6 +307,11 @@ function Draw(){
     {
         DrawBullet(bullets[i]);
     }
+
+    for(var i = 0; i < strikes.length; i++)
+    {
+        DrawStrike(strikes[i]);
+    }
 }
 
 function DrawBalloon(balloon){
@@ -283,6 +338,20 @@ function DrawBullet(bullet){
             bullet.y,
             bullet.image.width * scale / 2,
             bullet.image.height * scale / 2
+        )
+}
+
+function DrawStrike(strike){
+    context.drawImage(
+            strike.image,
+            0,
+            0,
+            strike.image.width,
+            strike.image.height,
+            strike.x,
+            strike.y,
+            strike.image.width * scale / 20,
+            strike.image.height * scale / 20
         )
 }
 
@@ -314,23 +383,27 @@ function KeyDown(e)
             }
             break;
         case 82: //R
-            var distance = 25;
-            if (bullets.length == 0){
-                var pos = 0 - distance;
-            }
-            else{
-                var pos = bullets[bullets.length - 1].x;
-            }
-            
-            var howmuch = bullets.length;
-            for(var i = 0; i < 5 - howmuch;i++){
-                bullets.push(new Bullet("assets/images/bullet.png",
-                    pos + distance,
-                    canvas.height - 50));
-                pos = pos + distance;
-                DrawBullet(bullets[i]);
-            }
+            setTimeout(Reload, 500);
             break;
+    }
+}
+// Перезарядка //
+function Reload(){
+    var distance = 25;
+    if (bullets.length == 0){
+        var pos = 0 - distance;
+    }
+    else{
+        var pos = bullets[bullets.length - 1].x;
+    }
+            
+    var howmuch = bullets.length;
+    for(var i = 0; i < 5 - howmuch;i++){
+        bullets.push(new Bullet("assets/images/bullet.png",
+            pos + distance,
+            canvas.height - 50));
+        pos = pos + distance;
+        DrawBullet(bullets[i]);
     }
 }
 
@@ -344,6 +417,23 @@ function Resize(){
 function RandomInt(min,max){
     let rand = min - 0.5 + Math.random() * (max - min + 1);
     return Math.round(rand);
+}
+
+function SetCookie(uname, scorevalue) {
+    for(var i = 0; i < records.length; i++){
+        var str = String(records[i]);
+        var current = str.split('=')[1];
+        var name = str.split('=')[0];
+
+        if(scorevalue > current && uname == name){
+            document.cookie = uname + "=" + scorevalue + ";" 
+            + "SameSite=None; Secure";
+        }
+        else if(uname != name){
+            document.cookie = uname + "=" + scorevalue + ";" 
+            + "SameSite=None; Secure";
+        }
+    }    
 }
 //
 }

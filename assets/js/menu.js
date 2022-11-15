@@ -18,6 +18,25 @@ $(document).ready(function(){
 		console.log(block_game);
 	});
 
+	$(".name").keydown(function(e) {
+    if(e.keyCode === 13) {
+      name_user = $('.name').val();
+		let block_menu = $('#menu');
+		let block_game = $('#game');
+		if(name_user != ""){
+					block_menu.css("display","none");
+		block_game.css("display","block");
+		Game();
+		}
+		else{
+			alert("Введите свое имя, пожалуйста")
+		}
+		console.log(name_user);
+		console.log(block_menu);
+		console.log(block_game);
+	}
+  });
+
 	$('.settings').click(function(){
 		let settings_window = $('.settings_window');
 		settings_window.fadeIn();
