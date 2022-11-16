@@ -88,7 +88,7 @@ class Balloon{
             && this.x < player.x)
             {
                 hit = true;
-                console.log("POP!");
+                // console.log("POP!");
             }
         }
         return hit;
@@ -151,7 +151,7 @@ var bullets = [];
 
 var background_img = new Background("assets/images/background.png",0);
 
-var speed = 2;
+var speed = 3;
 
 var mousePos = 0;
 
@@ -180,7 +180,7 @@ function Start(){
 
 function Stop(){
     SetCookie(name_user,score);
-    console.log(name_user + " " + score);
+    // console.log(name_user + " " + score);
 
     clearInterval(timer);// Остановка обновления
     timer = null;   
@@ -208,7 +208,8 @@ function Update(){
     if(player.dead)
     {
         Stop();
-        alert("Игра окончена")
+        if(!alert("Игра окончена"))
+            {window.location.reload();}
     }
 
     for(var i = 0; i < objects.length; i++)
@@ -219,7 +220,7 @@ function Update(){
 
         if(out){
             objects.splice(i,1);
-            console.log("out");
+            // console.log("out");
 
             var dist = 35;
             var p = canvas.width;
@@ -246,14 +247,14 @@ function Update(){
 // Передвижение мыши и прицела //
 canvas.addEventListener('mousemove',function(e){
     mousePos = CalcMousePos(canvas,e);
-    console.log("x:"+mousePos.x+" y:"+mousePos.y);
+    // console.log("x:"+mousePos.x+" y:"+mousePos.y);
 });
 
 // Клик мыши  //
 canvas.addEventListener('click',function(e){
     mousePos = CalcMousePos(canvas,e);
-    console.log("Click on: "+mousePos.x+", "+mousePos.y);
-    console.log("Player at: "+player.x+", "+player.y);
+    // console.log("Click on: "+mousePos.x+", "+mousePos.y);
+    // console.log("Player at: "+player.x+", "+player.y);
 
     var hit = false;
 
@@ -374,12 +375,12 @@ function KeyDown(e)
             if(timer == null)
             {
                 Start();
-                console.log("continue");
+                // console.log("continue");
             }
             else
             {
                 Stop();
-                console.log("stop");
+                // console.log("stop");
             }
             break;
         case 82: //R
